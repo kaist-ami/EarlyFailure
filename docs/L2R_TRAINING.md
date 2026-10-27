@@ -16,7 +16,7 @@ owned videos
 
 You do **not** need any step in this guide to run the main pipeline. The two
 official fused L2R checkpoints are already included in the package. Start with
-the [main README](../README.md#quick-start-main-pipeline) unless you intend to
+the [main README](../README.md#setup) unless you intend to
 train a new L2R model.
 
 ## Before you begin
