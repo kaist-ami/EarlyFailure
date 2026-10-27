@@ -159,11 +159,11 @@ vendored ViCLIP license.
 ## Citation
 
 ```bibtex
-@inproceedings{kwon2026earlyfailure,
-  title     = {Early Failure Detection and Intervention in Video Diffusion Models},
-  author    = {Kwon, Byung-Ki and Lim, Sohwi and Nam, Hyeon-Woo and Moon, Ye-Bin and Oh, Tae-Hyun},
-  booktitle = {Advances in Neural Information Processing Systems},
-  year      = {2026}
+@article{kwon2026earlyfailure,
+  title   = {Early Failure Detection and Intervention in Video Diffusion Models},
+  author  = {Kwon, Byung-Ki and Lim, Sohwi and Nam, Hyeon-Woo and Moon, Ye-Bin and Oh, Tae-Hyun},
+  journal = {arXiv preprint arXiv:2603.14320},
+  year    = {2026}
 }
 ```
 

@@ -18,7 +18,7 @@ date-released: "2026-03-15"
 license: MIT
 repository-code: "https://github.com/kaist-ami/Early-failure-video-diffusion"
 preferred-citation:
-  type: conference-paper
+  type: article
   title: "Early Failure Detection and Intervention in Video Diffusion Models"
   authors:
     - family-names: Kwon
@@ -32,10 +32,6 @@ preferred-citation:
     - family-names: Oh
       given-names: Tae-Hyun
   year: 2026
-  collection-title: "Advances in Neural Information Processing Systems"
-  collection-type: proceedings
-  conference:
-    name: "NeurIPS 2026"
   identifiers:
     - type: other
       value: "arXiv:2603.14320"
