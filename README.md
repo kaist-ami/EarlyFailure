@@ -1,11 +1,11 @@
-# Early Failure Detection and Intervention in Video Diffusion Models
+# Early Failure Detection and Intervention in Video Diffusion Models (NeurIPS 2026)
 
 ### [Paper](https://arxiv.org/abs/2603.14320) | [Local Qwen guide](docs/QWEN38_80GB.md) | [L2R training guide](docs/L2R_TRAINING.md)
 
-Official implementation of **Early Failure Detection and Intervention in Video
-Diffusion Models**. The pipeline inspects intermediate video latents, detects
-likely failures early, and applies a frame anchor or prompt refinement before
-regeneration.
+Official implementation of the NeurIPS 2026 paper **Early Failure Detection
+and Intervention in Video Diffusion Models**. The pipeline inspects intermediate
+video latents, detects likely failures early, and applies a frame anchor or
+prompt refinement before regeneration.
 
 Supported backends:
 
@@ -159,11 +159,11 @@ vendored ViCLIP license.
 ## Citation
 
 ```bibtex
-@article{kwon2026earlyfailure,
-  title   = {Early Failure Detection and Intervention in Video Diffusion Models},
-  author  = {Kwon, Byung-Ki and Lim, Sohwi and Nam, Hyeon-Woo and Moon, Ye-Bin and Oh, Tae-Hyun},
-  journal = {arXiv preprint arXiv:2603.14320},
-  year    = {2026}
+@inproceedings{kwon2026earlyfailure,
+  title     = {Early Failure Detection and Intervention in Video Diffusion Models},
+  author    = {Kwon, Byung-Ki and Lim, Sohwi and Nam, Hyeon-Woo and Moon, Ye-Bin and Oh, Tae-Hyun},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2026}
 }
 ```
 
