@@ -1,0 +1,45 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+.venv-qwen/
+venv/
+.env
+.env.*
+!.env.example
+
+# Optional user checkpoints and local caches. Bundled L2R weights live in src/.
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/*.bin
+checkpoints/*.safetensors
+.cache/
+huggingface/
+third_party/VBench/
+
+# Generated media and run metadata.
+outputs/
+runs/
+/data/
+/datasets/
+*.mp4
+*.avi
+*.mov
+*.webm
+
+# Two procedurally generated clips are intentionally versioned as data-prep
+# smoke tests. No research training dataset is distributed.
+!examples/l2r_training/videos/
+!examples/l2r_training/videos/*.mp4
+
+# IDE / OS files.
+.idea/
+.vscode/
+.DS_Store
+

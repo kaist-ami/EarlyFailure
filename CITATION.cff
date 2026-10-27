@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "Early Failure Detection and Intervention in Video Diffusion Models"
+type: software
+authors:
+  - family-names: Kwon
+    given-names: Byung-Ki
+  - family-names: Lim
+    given-names: Sohwi
+  - family-names: Nam
+    given-names: Hyeon-Woo
+  - family-names: Moon
+    given-names: Ye-Bin
+  - family-names: Oh
+    given-names: Tae-Hyun
+version: 0.1.0
+date-released: 2026-03-15
+license: MIT
+repository-code: "https://github.com/kaist-ami/Early-failure-video-diffusion"
+preferred-citation:
+  type: article
+  title: "Early Failure Detection and Intervention in Video Diffusion Models"
+  authors:
+    - family-names: Kwon
+      given-names: Byung-Ki
+    - family-names: Lim
+      given-names: Sohwi
+    - family-names: Nam
+      given-names: Hyeon-Woo
+    - family-names: Moon
+      given-names: Ye-Bin
+    - family-names: Oh
+      given-names: Tae-Hyun
+  year: 2026
+  identifiers:
+    - type: other
+      value: "arXiv:2603.14320"
+  url: "https://arxiv.org/abs/2603.14320"
+

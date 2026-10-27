@@ -1,0 +1,8 @@
+include CITATION.cff
+include LICENSE
+include requirements.txt
+include requirements-qwen.txt
+recursive-include checkpoints *.md
+recursive-include docs *.md
+recursive-include examples/l2r_training *.md *.mp4 *.py
+recursive-include tests *.py

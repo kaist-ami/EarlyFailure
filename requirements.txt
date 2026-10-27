@@ -1,0 +1,24 @@
+# Tested inference environment. The official PyTorch CUDA 12.1 index provides
+# torch 2.5.1 and torchvision 0.20.1; PyPI provides the remaining packages.
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+-e .[pipeline]
+
+accelerate==1.13.0
+diffusers==0.38.0
+einops==0.8.2
+ftfy==6.3.1
+huggingface-hub==0.36.2
+imageio[ffmpeg]==2.37.2
+numpy==1.26.4
+openai==2.18.0
+packaging==26.3
+Pillow==11.3.0
+protobuf==6.33.2
+regex==2025.11.3
+safetensors==0.8.0
+sentencepiece==0.2.0
+timm==1.0.12
+torch==2.5.1
+torchvision==0.20.1
+transformers==4.57.6
