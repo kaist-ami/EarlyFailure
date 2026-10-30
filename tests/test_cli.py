@@ -1,9 +1,12 @@
 from pathlib import Path
 
+import numpy as np
 import pytest
+from PIL import Image
 
 from early_failure_video_diffusion.cli import (
     _base_model_spec,
+    _prepare_video_frames,
     _runtime_metadata,
     _validate_output_mode,
     build_parser,
@@ -33,6 +36,23 @@ def test_checkpoint_arguments_are_optional() -> None:
     assert args.viclip_checkpoint is None
     assert args.viclip_vocab is None
     assert args.prompt_refiner == "openai"
+
+
+def test_uint8_video_frames_are_not_scaled_twice() -> None:
+    frames = np.array(
+        [
+            [[[0, 1, 255], [17, 128, 254]]],
+            [[[255, 0, 127], [3, 64, 192]]],
+        ],
+        dtype=np.uint8,
+    )
+
+    prepared = _prepare_video_frames(frames)
+
+    assert all(isinstance(frame, Image.Image) for frame in prepared)
+    np.testing.assert_array_equal(
+        np.stack([np.asarray(frame) for frame in prepared]), frames
+    )
 
 
 def test_qwen_refiner_arguments_are_explicit_and_friendly() -> None:
@@ -170,5 +190,3 @@ def test_test_set_mode_rejects_seed_override() -> None:
 
     with pytest.raises(ValueError, match="fixed released seed 42"):
         _validate_output_mode(args)
-
-

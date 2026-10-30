@@ -153,6 +153,24 @@ def test_cogvideox_probe_and_anchor_shapes() -> None:
     )
     assert output.frames.shape == (1, 5, 16, 8, 8)
 
+    paired_initial = pipeline.generate_with_inspection(
+        "prompt",
+        stopper=immediate_stopper(),
+        failure_threshold=0.22,
+        continue_on_failure=True,
+        num_frames=5,
+        num_inference_steps=2,
+        height=8,
+        width=8,
+        output_type="latent",
+    )
+    assert paired_initial.failed
+    assert paired_initial.frames.shape == (1, 5, 16, 8, 8)
+    assert paired_initial.preview is not None
+    assert paired_initial.stop_step == 0
+    assert paired_initial.steps_executed == 1
+    assert paired_initial.total_steps == 2
+
 
 def test_wan_probe_and_anchor_shapes() -> None:
     scheduler = UniPCMultistepScheduler(
@@ -199,3 +217,21 @@ def test_wan_probe_and_anchor_shapes() -> None:
         output_type="latent",
     )
     assert output.frames.shape == (1, 16, 2, 16, 16)
+
+    paired_initial = pipeline.generate_with_inspection(
+        "prompt",
+        stopper=immediate_stopper(),
+        failure_threshold=0.22,
+        continue_on_failure=True,
+        num_frames=5,
+        num_inference_steps=2,
+        height=16,
+        width=16,
+        output_type="latent",
+    )
+    assert paired_initial.failed
+    assert paired_initial.frames.shape == (1, 16, 2, 16, 16)
+    assert paired_initial.preview is not None
+    assert paired_initial.stop_step == 0
+    assert paired_initial.steps_executed == 1
+    assert paired_initial.total_steps == 2

@@ -41,7 +41,9 @@ def resolve_base_model_spec(
         default_revision = DEFAULT_MODEL_REVISIONS[backend]
     except KeyError as error:
         choices = ", ".join(sorted(DEFAULT_MODELS))
-        raise ValueError(f"unknown backend {backend!r}; choose one of: {choices}") from error
+        raise ValueError(
+            f"unknown backend {backend!r}; choose one of: {choices}"
+        ) from error
 
     resolved_model = model_id or default_model
     if is_local_model_reference(resolved_model):

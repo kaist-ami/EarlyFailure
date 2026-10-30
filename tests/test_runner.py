@@ -84,6 +84,45 @@ def test_baseline_disables_inspection_and_returns_completed_result() -> None:
     ]
 
 
+def test_paired_run_reuses_the_inspected_initial_pass() -> None:
+    initial = failed(0.08)
+    initial.frames = "baseline"
+    initial.total_steps = 50
+    pipeline = FakePipeline([initial, probe(0.20), completed("anchored")])
+    refiner = FakeRefiner()
+    callback_observations = []
+
+    baseline, result = HierarchicalInterventionRunner(pipeline, refiner).run_paired(
+        " prompt ",
+        on_baseline=lambda value: callback_observations.append(
+            (value.frames, len(pipeline.calls))
+        ),
+    )
+
+    assert baseline.completed
+    assert baseline.frames == "baseline"
+    assert baseline.steps_executed == 50
+    assert callback_observations == [("baseline", 1)]
+    assert result.decision_path == "initial_frame_anchor"
+    assert result.frames == "anchored"
+    assert pipeline.calls[0]["continue_on_failure"] is True
+    assert len(pipeline.calls) == 3
+    assert refiner.calls == 0
+
+
+def test_paired_initial_success_uses_one_generation_for_both_videos() -> None:
+    pipeline = FakePipeline([completed("shared frames")])
+    runner = HierarchicalInterventionRunner(pipeline, FakeRefiner())
+
+    baseline, result = runner.run_paired("prompt")
+
+    assert baseline.frames == "shared frames"
+    assert result.frames == "shared frames"
+    assert result.decision_path == "initial_video"
+    assert len(pipeline.calls) == 1
+    assert pipeline.calls[0]["continue_on_failure"] is True
+
+
 def test_initial_success_exits_immediately() -> None:
     pipeline = FakePipeline([completed()])
     refiner = FakeRefiner()

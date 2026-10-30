@@ -1,6 +1,6 @@
 # Early Failure Detection and Intervention in Video Diffusion Models (NeurIPS 2026)
 
-### [Paper](https://arxiv.org/abs/2603.14320) | [Local Qwen guide](docs/QWEN38_80GB.md) | [L2R training guide](docs/L2R_TRAINING.md)
+### [Project Page](https://byungki-k.github.io/EarlyFailure/?v=e9d4d05) | [Paper](https://arxiv.org/abs/2603.14320)
 
 Official implementation of the NeurIPS 2026 paper **Early Failure Detection
 and Intervention in Video Diffusion Models**. The pipeline inspects intermediate
@@ -21,8 +21,8 @@ Validated on Linux with Python 3.10, PyTorch 2.5.1, CUDA 12.1, Diffusers
 0.38.0, and Transformers 4.57.6. Python 3.10--3.12 is supported.
 
 ```bash
-git clone https://github.com/kaist-ami/Early-failure-video-diffusion.git
-cd Early-failure-video-diffusion
+git clone https://github.com/kaist-ami/EarlyFailure.git
+cd EarlyFailure
 
 python3.10 -m venv .venv
 source .venv/bin/activate

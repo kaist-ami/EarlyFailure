@@ -34,6 +34,7 @@ class EarlyFailureWanPipeline(InspectionPipelineMixin, WanPipeline):
         failure_threshold: float = 0.22,
         probe_only: bool = False,
         inspect_generation: bool = True,
+        continue_on_failure: bool = False,
         anchor_x0: torch.Tensor | None = None,
         anchor_start_step: int = 1,
         anchor_blend_steps: int = 2,
@@ -53,6 +54,8 @@ class EarlyFailureWanPipeline(InspectionPipelineMixin, WanPipeline):
             raise ValueError("Wan intervention currently supports one non-empty prompt")
         if probe_only and num_frames != 1:
             raise ValueError("probe_only=True requires num_frames=1")
+        if probe_only and continue_on_failure:
+            raise ValueError("continue_on_failure is not supported for probes")
         if inspect_generation and stopper is None:
             raise ValueError("inspection requires an AdaptiveBalancedStopper")
         if not isinstance(self.scheduler, UniPCMultistepScheduler):
@@ -185,6 +188,9 @@ class EarlyFailureWanPipeline(InspectionPipelineMixin, WanPipeline):
         history = InspectionHistory()
         inspection_active = bool(inspect_generation)
         accepted_decision: StopDecision | None = None
+        failed_decision: StopDecision | None = None
+        failed_snapshot = None
+        failed_steps_executed: int | None = None
         boundary_timestep = (
             self.config.boundary_ratio * self.scheduler.config.num_train_timesteps
             if self.config.boundary_ratio is not None
@@ -307,17 +313,23 @@ class EarlyFailureWanPipeline(InspectionPipelineMixin, WanPipeline):
                         self.maybe_free_model_hooks()
                         return result
                     if decision.score < failure_threshold:
-                        result = self._early_result(
-                            status="failed",
-                            decision=decision,
-                            snapshot=snapshot,
-                            layout="bcthw",
-                            steps_executed=steps_executed,
-                            total_steps=total_steps,
-                        )
-                        self._current_timestep = None
-                        self.maybe_free_model_hooks()
-                        return result
+                        if not continue_on_failure:
+                            result = self._early_result(
+                                status="failed",
+                                decision=decision,
+                                snapshot=snapshot,
+                                layout="bcthw",
+                                steps_executed=steps_executed,
+                                total_steps=total_steps,
+                            )
+                            self._current_timestep = None
+                            self.maybe_free_model_hooks()
+                            return result
+                        failed_decision = decision
+                        failed_snapshot = snapshot
+                        failed_steps_executed = steps_executed
+                        inspection_active = False
+                        continue
                     accepted_decision = decision
                     inspection_active = False
 
@@ -337,21 +349,27 @@ class EarlyFailureWanPipeline(InspectionPipelineMixin, WanPipeline):
             self.maybe_free_model_hooks()
             return result
 
-        if inspect_generation and accepted_decision is None:
+        if inspect_generation and accepted_decision is None and failed_decision is None:
             assert stopper is not None
             decision = stopper.finalize()
             if decision.score < failure_threshold:
-                result = self._early_result(
-                    status="failed",
-                    decision=decision,
-                    snapshot=history.select(decision),
-                    layout="bcthw",
-                    steps_executed=steps_executed,
-                    total_steps=total_steps,
-                )
-                self.maybe_free_model_hooks()
-                return result
-            accepted_decision = decision
+                snapshot = history.select(decision)
+                if not continue_on_failure:
+                    result = self._early_result(
+                        status="failed",
+                        decision=decision,
+                        snapshot=snapshot,
+                        layout="bcthw",
+                        steps_executed=steps_executed,
+                        total_steps=total_steps,
+                    )
+                    self.maybe_free_model_hooks()
+                    return result
+                failed_decision = decision
+                failed_snapshot = snapshot
+                failed_steps_executed = steps_executed
+            else:
+                accepted_decision = decision
 
         if output_type == "latent":
             video = latents
@@ -371,9 +389,25 @@ class EarlyFailureWanPipeline(InspectionPipelineMixin, WanPipeline):
                 video, output_type=output_type
             )
 
+        frames = first_video(video) if output_type != "latent" else video
+        if failed_decision is not None:
+            assert failed_snapshot is not None
+            assert failed_steps_executed is not None
+            result = self._early_result(
+                status="failed",
+                decision=failed_decision,
+                snapshot=failed_snapshot,
+                layout="bcthw",
+                steps_executed=failed_steps_executed,
+                total_steps=total_steps,
+            )
+            result.frames = frames
+            self.maybe_free_model_hooks()
+            return result
+
         result = GenerationResult(
             status="completed",
-            frames=first_video(video) if output_type != "latent" else video,
+            frames=frames,
             score=accepted_decision.score if accepted_decision is not None else None,
             stop_step=(
                 accepted_decision.stop_step if accepted_decision is not None else None

@@ -176,11 +176,29 @@ def _write_json(path: Path, payload: dict[str, Any]) -> None:
     )
 
 
+def _prepare_video_frames(frames: Any) -> Any:
+    """Keep uint8 NumPy videos from being scaled by Diffusers a second time."""
+
+    import numpy as np
+    from PIL import Image
+
+    if isinstance(frames, np.ndarray) and frames.dtype == np.uint8:
+        return [Image.fromarray(frame) for frame in frames]
+    if (
+        isinstance(frames, (list, tuple))
+        and frames
+        and isinstance(frames[0], np.ndarray)
+        and frames[0].dtype == np.uint8
+    ):
+        return [Image.fromarray(frame) for frame in frames]
+    return frames
+
+
 def _export_video(frames: Any, path: Path, fps: int) -> None:
     from diffusers.utils import export_to_video
 
     path.parent.mkdir(parents=True, exist_ok=True)
-    export_to_video(frames, str(path), fps=fps)
+    export_to_video(_prepare_video_frames(frames), str(path), fps=fps)
 
 
 def _runtime_metadata(
@@ -259,25 +277,30 @@ def _run_test_set(
         print(f"test example: {example.slug}")
         print(f"prompt: {example.prompt}")
 
-        baseline = runner.generate_baseline(example.prompt)
-        _export_video(baseline.frames, initial_path, args.fps)
-        initial_metadata = baseline.trace("baseline")
-        initial_metadata.update(
-            {
-                "generation_mode": "baseline",
-                "prompt": example.prompt,
-                "test_example": example.slug,
-                **runtime_metadata,
-            }
-        )
-        _write_json(example_directory / "initial.json", initial_metadata)
+        def save_baseline(baseline) -> None:
+            _export_video(baseline.frames, initial_path, args.fps)
+            initial_metadata = baseline.trace("baseline")
+            initial_metadata.update(
+                {
+                    "generation_mode": "paired_baseline",
+                    "paired_single_pass": True,
+                    "prompt": example.prompt,
+                    "test_example": example.slug,
+                    **runtime_metadata,
+                }
+            )
+            _write_json(example_directory / "initial.json", initial_metadata)
 
-        result = runner.run(example.prompt)
+        _, result = runner.run_paired(
+            example.prompt,
+            on_baseline=save_baseline,
+        )
         _export_video(result.frames, output_path, args.fps)
         output_metadata = result.metadata()
         output_metadata.update(
             {
                 "generation_mode": "intervention",
+                "paired_single_pass": True,
                 "test_example": example.slug,
                 "baseline_video": "initial.mp4",
                 **runtime_metadata,
@@ -456,8 +479,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     refiner_revision = getattr(refiner, "revision", None)
     print(
-        f"Prompt refiner: {args.prompt_refiner}:"
-        f"{_safe_model_reference(refiner_model)}"
+        f"Prompt refiner: {args.prompt_refiner}:{_safe_model_reference(refiner_model)}"
     )
     config = RunnerConfig(
         height=args.height,
