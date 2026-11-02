@@ -99,12 +99,10 @@ shared-cache, and offline instructions.
 Test-set mode writes a normal baseline as `initial.mp4` and our result as
 `output.mp4`, using seed `42` for both.
 
-| Backend | Prompt |
+| Backend | Prompt examples |
 | --- | --- |
-| CogVideoX-5B | `Iron Man flying in the sky` |
-| CogVideoX-5B | `A confused panda in calculus class` |
-| Wan2.1-1.3B | `A corgi's head depicted as an explosion of a nebula` |
-| Wan2.1-1.3B | `A couple in formal evening wear going home get caught in a heavy downpour with umbrellas by Hokusai, in the style of Ukiyoss` |
+| CogVideoX-5B | `Iron Man flying in the sky`<br>`A confused panda in calculus class` |
+| Wan2.1-1.3B | `A corgi's head depicted as an explosion of a nebula`<br>`A couple in formal evening wear going home get caught in a heavy downpour with umbrellas by Hokusai, in the style of Ukiyoss` |
 | Wan2.1-14B | `A person is tai chi` |
 
 ```bash
