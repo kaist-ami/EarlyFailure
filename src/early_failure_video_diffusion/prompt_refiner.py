@@ -70,9 +70,15 @@ Task:
 issues.
 Guidelines:
 - Base your revision on both the original prompt and what is visible in the preview.
+- Treat original_prompt as the authoritative description of the intended video. The preview may
+show a failed or incorrect subject, action, or scene.
+- Preserve every core subject and action from original_prompt. If the preview conflicts with them,
+correct the conflict in the revision instead of adopting it.
 - Make the prompt clearer, more concrete, and visually stable.
 - Clarify subject visibility, action, framing, or scene when needed.
 - Do not change the core meaning or add unrelated objects/actions.
+- Explicitly state the intended subject and action in refined_prompt, and never place either one in
+negative_prompt.
 - Keep the final prompt concise.
 Negative prompt:
 - Optional, single comma-separated string

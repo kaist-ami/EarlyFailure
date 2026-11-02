@@ -16,7 +16,7 @@ authors:
 version: 0.1.0
 date-released: "2026-03-15"
 license: MIT
-repository-code: "https://github.com/kaist-ami/Early-failure-video-diffusion"
+repository-code: "https://github.com/kaist-ami/EarlyFailure"
 preferred-citation:
   type: article
   title: "Early Failure Detection and Intervention in Video Diffusion Models"

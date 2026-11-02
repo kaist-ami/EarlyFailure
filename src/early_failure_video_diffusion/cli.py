@@ -12,7 +12,9 @@ import torch
 from .assets import VICLIP_REVISION, VICLIP_SHA256
 from .l2r import LatentToRGB
 from .model_specs import (
+    DEFAULT_GENERATION_SETTINGS,
     DEFAULT_MODELS,
+    WAN_FLOW_SHIFTS,
     resolve_base_model_spec,
     safe_model_reference,
 )
@@ -36,6 +38,15 @@ def _base_model_spec(args: argparse.Namespace) -> tuple[str, str | None]:
         model_id=args.model_id,
         revision=args.model_revision,
     )
+
+
+def _apply_backend_defaults(args: argparse.Namespace) -> None:
+    """Fill shape defaults after argparse has resolved the selected backend."""
+
+    defaults = DEFAULT_GENERATION_SETTINGS[args.backend]
+    for name, value in defaults.items():
+        if getattr(args, name) is None:
+            setattr(args, name, value)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -141,13 +152,25 @@ def build_parser() -> argparse.ArgumentParser:
         action=argparse.BooleanOptionalAction,
         default=None,
         help=(
-            "Defaults to enabled for CogVideoX and for either backend when the "
+            "Defaults to enabled for CogVideoX and for every backend when the "
             "Qwen refiner is selected"
         ),
     )
-    parser.add_argument("--height", type=int, default=480)
-    parser.add_argument("--width", type=int, default=720)
-    parser.add_argument("--num-frames", type=int, default=49)
+    parser.add_argument(
+        "--height",
+        type=int,
+        help="Output height (backend default: 480, or 720 for wan14b)",
+    )
+    parser.add_argument(
+        "--width",
+        type=int,
+        help="Output width (backend default: 720, or 1280 for wan14b)",
+    )
+    parser.add_argument(
+        "--num-frames",
+        type=int,
+        help="Output frames (backend default: 49, or 81 for wan14b)",
+    )
     parser.add_argument("--num-inference-steps", type=int, default=50)
     parser.add_argument("--guidance-scale", type=float, default=6.0)
     parser.add_argument(
@@ -220,6 +243,7 @@ def _runtime_metadata(
         "num_frames": args.num_frames,
         "num_inference_steps": args.num_inference_steps,
         "guidance_scale": args.guidance_scale,
+        "flow_shift": WAN_FLOW_SHIFTS.get(args.backend),
         "fps": args.fps,
         "l2r_checkpoint": l2r_source,
         "viclip_checkpoint": viclip_source,
@@ -347,7 +371,7 @@ def _load_pipeline(args: argparse.Namespace, dtype: torch.dtype):
         pipeline = EarlyFailureCogVideoXPipeline.from_pretrained(
             model_id, **pretrained_kwargs
         )
-    else:
+    elif args.backend in WAN_FLOW_SHIFTS:
         from diffusers import AutoencoderKLWan
         from diffusers.schedulers import UniPCMultistepScheduler
 
@@ -363,8 +387,10 @@ def _load_pipeline(args: argparse.Namespace, dtype: torch.dtype):
             pipeline.scheduler.config,
             prediction_type="flow_prediction",
             use_flow_sigmas=True,
-            flow_shift=3.0,
+            flow_shift=WAN_FLOW_SHIFTS[args.backend],
         )
+    else:  # pragma: no cover - argparse and model-spec validation guard this
+        raise ValueError(f"unsupported backend: {args.backend}")
 
     if hasattr(pipeline.vae, "enable_tiling"):
         pipeline.vae.enable_tiling()
@@ -407,6 +433,7 @@ def _load_prompt_refiner(
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    _apply_backend_defaults(args)
     _validate_output_mode(args)
     device = torch.device(args.device)
     if device.type != "cuda" or not torch.cuda.is_available():

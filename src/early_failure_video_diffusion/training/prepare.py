@@ -13,7 +13,6 @@ from PIL import Image
 from safetensors.torch import save_file
 
 from ..model_specs import (
-    DEFAULT_MODELS,
     resolve_base_model_spec,
     safe_model_reference,
 )
@@ -159,9 +158,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--backend",
-        choices=sorted(DEFAULT_MODELS),
+        choices=("cogvideox", "wan"),
         required=True,
-        help="VAE/latent convention to use",
+        help=(
+            "VAE/latent convention to use; Wan2.1-14B inference reuses the "
+            "released Wan L2R checkpoint"
+        ),
     )
     parser.add_argument(
         "--video",

@@ -13,6 +13,8 @@ import torch.nn.functional as F
 _BUNDLED_CHECKPOINTS = {
     "cogvideox": "deploy_fused_crf18_cogvideox.pt",
     "wan": "deploy_fused_crf18_wan1.5B.pt",
+    # Wan2.1-1.3B and 14B share the latent/VAE convention used by L2R.
+    "wan14b": "deploy_fused_crf18_wan1.5B.pt",
 }
 
 

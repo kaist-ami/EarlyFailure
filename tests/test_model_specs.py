@@ -1,7 +1,9 @@
 from pathlib import Path
 
 from early_failure_video_diffusion.model_specs import (
+    DEFAULT_GENERATION_SETTINGS,
     DEFAULT_MODEL_REVISIONS,
+    WAN_FLOW_SHIFTS,
     resolve_base_model_spec,
     safe_model_reference,
 )
@@ -11,6 +13,15 @@ def test_default_model_revisions_are_pinned() -> None:
     for backend, expected_revision in DEFAULT_MODEL_REVISIONS.items():
         _, revision = resolve_base_model_spec(backend)
         assert revision == expected_revision
+
+
+def test_wan14b_paper_inference_settings_are_explicit() -> None:
+    assert DEFAULT_GENERATION_SETTINGS["wan14b"] == {
+        "height": 720,
+        "width": 1280,
+        "num_frames": 81,
+    }
+    assert WAN_FLOW_SHIFTS == {"wan": 3.0, "wan14b": 5.0}
 
 
 def test_custom_remote_model_does_not_inherit_an_unrelated_revision() -> None:

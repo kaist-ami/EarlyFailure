@@ -62,6 +62,9 @@ def test_refiner_uses_injected_client_and_returns_normalized_revision() -> None:
     assert '- original_prompt: "prompt"' in instruction
     assert "- predicted_score_at_stop: 0.100000" in instruction
     assert "- score_range: 0.0 to 1.0 (higher is better)" in instruction
+    assert "Treat original_prompt as the authoritative description" in instruction
+    assert "The preview may\nshow a failed or incorrect subject" in instruction
+    assert "never place either one in\nnegative_prompt" in instruction
     assert "stop_step" not in instruction
     assert "stop_reason" not in instruction
 

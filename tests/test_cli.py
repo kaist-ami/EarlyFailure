@@ -5,6 +5,7 @@ import pytest
 from PIL import Image
 
 from early_failure_video_diffusion.cli import (
+    _apply_backend_defaults,
     _base_model_spec,
     _prepare_video_frames,
     _runtime_metadata,
@@ -76,7 +77,7 @@ def test_qwen_refiner_arguments_are_explicit_and_friendly() -> None:
 
 
 def test_built_in_models_resolve_to_tested_revisions() -> None:
-    for backend in ("cogvideox", "wan"):
+    for backend in ("cogvideox", "wan", "wan14b"):
         args = build_parser().parse_args(
             [
                 "--backend",
@@ -89,6 +90,56 @@ def test_built_in_models_resolve_to_tested_revisions() -> None:
         )
         _, revision = _base_model_spec(args)
         assert revision == DEFAULT_MODEL_REVISIONS[backend]
+
+
+@pytest.mark.parametrize(
+    ("backend", "expected"),
+    [
+        ("cogvideox", (480, 720, 49)),
+        ("wan", (480, 720, 49)),
+        ("wan14b", (720, 1280, 81)),
+    ],
+)
+def test_backend_generation_defaults(
+    backend: str, expected: tuple[int, int, int]
+) -> None:
+    args = build_parser().parse_args(
+        [
+            "--backend",
+            backend,
+            "--prompt",
+            "a paper crane",
+            "--output",
+            "output.mp4",
+        ]
+    )
+
+    _apply_backend_defaults(args)
+
+    assert (args.height, args.width, args.num_frames) == expected
+
+
+def test_explicit_shape_overrides_backend_defaults() -> None:
+    args = build_parser().parse_args(
+        [
+            "--backend",
+            "wan14b",
+            "--prompt",
+            "a paper crane",
+            "--output",
+            "output.mp4",
+            "--height",
+            "480",
+            "--width",
+            "832",
+            "--num-frames",
+            "49",
+        ]
+    )
+
+    _apply_backend_defaults(args)
+
+    assert (args.height, args.width, args.num_frames) == (480, 832, 49)
 
 
 def test_runtime_metadata_redacts_local_paths(tmp_path: Path) -> None:
@@ -123,6 +174,7 @@ def test_runtime_metadata_redacts_local_paths(tmp_path: Path) -> None:
     assert metadata["model_revision"] is None
     assert metadata["prompt_refiner_model"] == "local"
     assert metadata["prompt_refiner_revision"] is None
+    assert metadata["flow_shift"] == 3.0
     assert metadata["viclip_revision"] is None
     assert metadata["viclip_sha256"] is None
     assert str(tmp_path) not in str(metadata)
@@ -137,6 +189,7 @@ def test_default_qwen_revision_is_the_tested_commit() -> None:
 def test_released_test_sets_and_output_directories_are_exact() -> None:
     cogvideox = inference_examples("cogvideox")
     wan = inference_examples("wan")
+    wan14b = inference_examples("wan14b")
 
     assert [example.prompt for example in cogvideox] == [
         "Iron Man flying in the sky",
@@ -149,9 +202,11 @@ def test_released_test_sets_and_output_directories_are_exact() -> None:
             "downpour with umbrellas by Hokusai, in the style of Ukiyoss"
         ),
     ]
+    assert wan14b == wan
     assert TEST_SET_OUTPUT_DIRECTORIES == {
         "cogvideox": "cogvideox-5b",
         "wan": "wan2.1-1.3b",
+        "wan14b": "wan2.1-14b",
     }
     assert TEST_SET_SEED == 42
 

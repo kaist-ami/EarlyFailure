@@ -30,7 +30,7 @@ def test_strict_checkpoint_roundtrip(tmp_path: Path) -> None:
         assert torch.equal(value, restored.state_dict()[key])
 
 
-@pytest.mark.parametrize("backend", ["cogvideox", "wan"])
+@pytest.mark.parametrize("backend", ["cogvideox", "wan", "wan14b"])
 def test_bundled_checkpoint_loads_strictly(backend: str) -> None:
     model = LatentToRGB.from_pretrained(backend)
 

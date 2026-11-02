@@ -11,8 +11,10 @@ Supported backends:
 
 - [`zai-org/CogVideoX-5b`](https://huggingface.co/zai-org/CogVideoX-5b)
 - [`Wan-AI/Wan2.1-T2V-1.3B-Diffusers`](https://huggingface.co/Wan-AI/Wan2.1-T2V-1.3B-Diffusers)
+- [`Wan-AI/Wan2.1-T2V-14B-Diffusers`](https://huggingface.co/Wan-AI/Wan2.1-T2V-14B-Diffusers)
 
-Both fused L2R checkpoints are included. The selected base model and the
+The fused L2R checkpoints are included. All supported Wan backends share the
+bundled Wan L2R checkpoint. The selected base model and the
 official VBench ViCLIP checkpoint are downloaded automatically on first use.
 
 ## Setup
@@ -58,11 +60,18 @@ early-failure-video \
   --backend wan \
   --prompt "A red panda folds a paper crane on a wooden desk." \
   --output outputs/wan.mp4
+
+# Wan2.1-14B
+early-failure-video \
+  --backend wan14b \
+  --prompt "A person is tai chi" \
+  --output outputs/wan14b.mp4
 ```
 
-Each video is accompanied by a JSON decision trace. The default seed is `42`
-and the default length is 49 frames. Run `early-failure-video --help` for
-resolution, cache, offline, checkpoint, and model options.
+Each video is accompanied by a JSON decision trace. The default seed is `42`.
+CogVideoX-5B and Wan2.1-1.3B default to 720x480 and 49 frames; Wan2.1-14B
+defaults to the paper setting of 1280x720 and 81 frames. Run
+`early-failure-video --help` for overrides and other options.
 
 ### Local Qwen3.8-27B
 
@@ -94,8 +103,8 @@ Test-set mode writes a normal baseline as `initial.mp4` and our result as
 | --- | --- |
 | CogVideoX-5B | `Iron Man flying in the sky` |
 | CogVideoX-5B | `A confused panda in calculus class` |
-| Wan2.1-1.3B | `A corgi's head depicted as an explosion of a nebula` |
-| Wan2.1-1.3B | `A couple in formal evening wear going home get caught in a heavy downpour with umbrellas by Hokusai, in the style of Ukiyoss` |
+| Wan2.1 (1.3B/14B) | `A corgi's head depicted as an explosion of a nebula` |
+| Wan2.1 (1.3B/14B) | `A couple in formal evening wear going home get caught in a heavy downpour with umbrellas by Hokusai, in the style of Ukiyoss` |
 
 ```bash
 early-failure-video \
@@ -103,7 +112,7 @@ early-failure-video \
   --test-set \
   --output-dir outputs/test-set
 
-# Replace cogvideox with wan for the Wan examples.
+# Replace cogvideox with wan or wan14b for the Wan examples.
 # Add --prompt-refiner qwen to use the local refiner.
 ```
 

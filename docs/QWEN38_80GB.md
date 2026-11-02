@@ -115,6 +115,17 @@ early-failure-video \
   --output outputs/wan-qwen.mp4
 ```
 
+Wan2.1-14B (1280x720, 81 frames by default):
+
+```bash
+early-failure-video \
+  --backend wan14b \
+  --prompt-refiner qwen \
+  --qwen-python .venv-qwen/bin/python \
+  --prompt "A person is tai chi" \
+  --output outputs/wan14b-qwen.mp4
+```
+
 `.venv-qwen/bin/python` is the default, so `--qwen-python` can normally be
 omitted. It can also be set once with `QWEN_PYTHON=/path/to/python`.
 
@@ -140,10 +151,10 @@ worker directory and are removed after the worker exits, including failures.
   backends. `--no-cpu-offload` is rejected because it would break the handoff.
 - During Qwen inference, the video model remains in host memory; L2R and ViCLIP
   are also parked on CPU. As a practical baseline, 96--128 GB of system RAM is
-  recommended for a comfortable handoff.
+  recommended for the smaller backends and at least 160 GB for Wan2.1-14B.
 - Reserve space for Qwen, the selected video model, ViCLIP, and Hugging Face
-  cache metadata. At least 120 GB of free cache storage is a useful starting
-  point when both backends may be downloaded.
+  cache metadata. Allow at least 180 GB of free cache storage when Wan2.1-14B
+  and Qwen are both downloaded.
 - Model startup happens only on the refinement branch, but loading 55.6 GB of
   weights still adds noticeable latency. The design favors predictable VRAM
   release over keeping a second model server resident.

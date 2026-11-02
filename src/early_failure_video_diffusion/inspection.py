@@ -268,7 +268,10 @@ def inspect_step(
     scores: torch.Tensor,
     x0_candidates: torch.Tensor,
 ) -> tuple[int, StopDecision | None]:
-    candidate_index = int(torch.argmax(scores).item())
+    finite = torch.isfinite(scores)
+    if not bool(finite.any()):
+        raise RuntimeError("scorer returned no finite candidate scores")
+    candidate_index = int(torch.argmax(scores.masked_fill(~finite, -torch.inf)).item())
     score = float(scores[candidate_index].item())
     history.record(step, score, x0_candidates[candidate_index])
     return candidate_index, stopper.update(step, score)

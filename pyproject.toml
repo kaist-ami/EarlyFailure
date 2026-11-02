@@ -60,8 +60,8 @@ early-failure-fuse-l2r = "early_failure_video_diffusion.training.fuse:main"
 
 [project.urls]
 Paper = "https://arxiv.org/abs/2603.14320"
-Repository = "https://github.com/kaist-ami/Early-failure-video-diffusion"
-Issues = "https://github.com/kaist-ami/Early-failure-video-diffusion/issues"
+Repository = "https://github.com/kaist-ami/EarlyFailure"
+Issues = "https://github.com/kaist-ami/EarlyFailure/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -6,11 +6,24 @@ from pathlib import Path
 DEFAULT_MODELS = {
     "cogvideox": "zai-org/CogVideoX-5b",
     "wan": "Wan-AI/Wan2.1-T2V-1.3B-Diffusers",
+    "wan14b": "Wan-AI/Wan2.1-T2V-14B-Diffusers",
 }
 
 DEFAULT_MODEL_REVISIONS = {
     "cogvideox": "8fc5b281006c82b82d34fd2543d2f0ebb4e7e321",
     "wan": "0fad780a534b6463e45facd96134c9f345acfa5b",
+    "wan14b": "38ec498cb3208fb688890f8cc7e94ede2cbd7f68",
+}
+
+DEFAULT_GENERATION_SETTINGS = {
+    "cogvideox": {"height": 480, "width": 720, "num_frames": 49},
+    "wan": {"height": 480, "width": 720, "num_frames": 49},
+    "wan14b": {"height": 720, "width": 1280, "num_frames": 81},
+}
+
+WAN_FLOW_SHIFTS = {
+    "wan": 3.0,
+    "wan14b": 5.0,
 }
 
 

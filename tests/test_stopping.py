@@ -1,5 +1,9 @@
 import math
 
+import pytest
+import torch
+
+from early_failure_video_diffusion.inspection import InspectionHistory, inspect_step
 from early_failure_video_diffusion.stopping import (
     AdaptiveBalancedStopper,
     make_video_stopper,
@@ -38,3 +42,32 @@ def test_nan_score_is_ignored() -> None:
     stopper = AdaptiveBalancedStopper(max_step=1, min_step=0)
     assert stopper.update(0, math.nan) is None
     assert stopper.last_step is None
+
+
+def test_candidate_selection_ignores_non_finite_scores() -> None:
+    stopper = AdaptiveBalancedStopper(max_step=3, min_step=0)
+    history = InspectionHistory()
+
+    index, decision = inspect_step(
+        stopper=stopper,
+        history=history,
+        step=0,
+        scores=torch.tensor([math.nan, 0.25, math.inf]),
+        x0_candidates=torch.arange(3, dtype=torch.float32).view(3, 1),
+    )
+
+    assert index == 1
+    assert decision is None
+    assert history.best is not None
+    assert history.best.score == 0.25
+
+
+def test_candidate_selection_rejects_all_non_finite_scores() -> None:
+    with pytest.raises(RuntimeError, match="no finite candidate scores"):
+        inspect_step(
+            stopper=AdaptiveBalancedStopper(max_step=3, min_step=0),
+            history=InspectionHistory(),
+            step=0,
+            scores=torch.tensor([math.nan, math.inf]),
+            x0_candidates=torch.zeros(2, 1),
+        )
