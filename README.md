@@ -103,8 +103,9 @@ Test-set mode writes a normal baseline as `initial.mp4` and our result as
 | --- | --- |
 | CogVideoX-5B | `Iron Man flying in the sky` |
 | CogVideoX-5B | `A confused panda in calculus class` |
-| Wan2.1 (1.3B/14B) | `A corgi's head depicted as an explosion of a nebula` |
-| Wan2.1 (1.3B/14B) | `A couple in formal evening wear going home get caught in a heavy downpour with umbrellas by Hokusai, in the style of Ukiyoss` |
+| Wan2.1-1.3B | `A corgi's head depicted as an explosion of a nebula` |
+| Wan2.1-1.3B | `A couple in formal evening wear going home get caught in a heavy downpour with umbrellas by Hokusai, in the style of Ukiyoss` |
+| Wan2.1-14B | `A person is tai chi` |
 
 ```bash
 early-failure-video \
@@ -112,7 +113,7 @@ early-failure-video \
   --test-set \
   --output-dir outputs/test-set
 
-# Replace cogvideox with wan or wan14b for the Wan examples.
+# Replace cogvideox with wan or wan14b for that backend's prompts.
 # Add --prompt-refiner qwen to use the local refiner.
 ```
 

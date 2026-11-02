@@ -69,7 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
     input_group.add_argument(
         "--test-set",
         action="store_true",
-        help="Run the two released examples for the selected backend",
+        help="Run the released example prompts for the selected backend",
     )
     parser.add_argument(
         "--l2r-checkpoint",

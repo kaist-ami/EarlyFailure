@@ -37,10 +37,17 @@ _WAN_EXAMPLES = (
     ),
 )
 
+_WAN14B_EXAMPLES = (
+    InferenceExample(
+        slug="01-person-is-tai-chi",
+        prompt="A person is tai chi",
+    ),
+)
+
 INFERENCE_TEST_SETS: dict[str, tuple[InferenceExample, ...]] = {
     "cogvideox": _COGVIDEOX_EXAMPLES,
     "wan": _WAN_EXAMPLES,
-    "wan14b": _WAN_EXAMPLES,
+    "wan14b": _WAN14B_EXAMPLES,
 }
 
 

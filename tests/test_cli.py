@@ -202,7 +202,8 @@ def test_released_test_sets_and_output_directories_are_exact() -> None:
             "downpour with umbrellas by Hokusai, in the style of Ukiyoss"
         ),
     ]
-    assert wan14b == wan
+    assert [example.prompt for example in wan14b] == ["A person is tai chi"]
+    assert [example.slug for example in wan14b] == ["01-person-is-tai-chi"]
     assert TEST_SET_OUTPUT_DIRECTORIES == {
         "cogvideox": "cogvideox-5b",
         "wan": "wan2.1-1.3b",
